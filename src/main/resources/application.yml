@@ -13,7 +13,6 @@ spring:
           driver-class-name: com.mysql.cj.jdbc.Driver
           url: jdbc:mysql://172.17.44.44:3306/data_platform?useSSL=false
 #          url: jdbc:mysql://172.17.32.135:3306/data_platform?useSSL=false
-#
           username: data_platform
           password: D5~76Jc7a28cYQMw027bmZ8WZ
 #          username: root
