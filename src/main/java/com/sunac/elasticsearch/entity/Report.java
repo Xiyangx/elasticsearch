@@ -2,10 +2,7 @@ package com.sunac.elasticsearch.entity;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.format.DateTimeFormat;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * @Description: 报表类
@@ -30,7 +27,7 @@ public class Report {
     @ExcelProperty(value = "汇率", index = 5)
     private String bkpfKursf;
     @ExcelProperty(value = "行项目数", index = 6)
-    private String buzei;
+    private String bsegbuzei;
     @ExcelProperty(value = "公司代码", index = 7)
     private String bsegBukrs;
     @ExcelProperty(value = "财年", index = 8)

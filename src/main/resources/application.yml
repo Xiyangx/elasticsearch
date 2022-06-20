@@ -10,13 +10,18 @@ spring:
           password: hive_123
           driver-class-name: org.apache.hive.jdbc.HiveDriver
         slave_mysql:
+          driver-class-name: com.mysql.cj.jdbc.Driver
           url: jdbc:mysql://172.17.44.44:3306/data_platform?useSSL=false
 #          url: jdbc:mysql://172.17.32.135:3306/data_platform?useSSL=false
-          driver-class-name: com.mysql.cj.jdbc.Driver
+#
           username: data_platform
           password: D5~76Jc7a28cYQMw027bmZ8WZ
 #          username: root
 #          password: 12345678
+  mvc:
+    async:
+      request-timeout: 2000 #单位是毫秒哦 2000代表2秒
+
 logging:
   level:
     com.example.hive.mapper: debug

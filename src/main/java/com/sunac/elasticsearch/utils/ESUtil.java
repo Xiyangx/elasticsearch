@@ -14,6 +14,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ public class ESUtil {
      * @param client     restHighLevelClient
      * @param query      queryBuilder
      * @return List, 可以使用fun转换为T结果
-     * @throws Exception
+     *
      */
     public static List<Report> searchResponse(RestHighLevelClient client, BoolQueryBuilder query) throws Exception {
         //滚动查询的Scroll
@@ -47,7 +48,8 @@ public class ESUtil {
         sourceBuilder.query(query);
         //每次滚动的长度
         sourceBuilder.size(SIZE);
-
+        //排序  SortOrder.ASC   SortOrder.DESC
+        sourceBuilder.sort("bsegbelnr.keyword", SortOrder.ASC).sort("bsegbuzei.keyword",SortOrder.ASC);
         //加入scroll和构造器
         request.scroll(scroll);
         request.source(sourceBuilder);

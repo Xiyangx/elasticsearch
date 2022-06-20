@@ -24,7 +24,14 @@ public class DownloadController {
 
     @RequestMapping(value = "/download/{year}/{month}", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String year, @PathVariable String month) throws IOException {
-//        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/" + "excel.zip";
+
+
+
+//        String fileName = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/"
+//                  + year
+//                  + "/"
+//                  + month
+//                  + ".zip";
         String fileName = "/opt/project/file/"
                 + year
                 + "/"
@@ -32,7 +39,8 @@ public class DownloadController {
                 + ".zip";
 
         FileSystemResource file = new FileSystemResource(fileName);
-        logger.info("--------下载成功------");
+        logger.info("--------要下载的文件是：{}/{}.zip------",year,month);
+        logger.info("--------正在下载------");
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", file.getFilename()));
@@ -45,6 +53,7 @@ public class DownloadController {
                 .contentLength(file.contentLength())
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(new InputStreamResource(file.getInputStream()));
+
     }
 
 }

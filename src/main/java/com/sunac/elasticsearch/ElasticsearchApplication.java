@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @Date 2022/6/1 3:16 下午
  * @Version 1.0
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages="com.sunac.elasticsearch")
 @MapperScan("com.sunac.elasticsearch.mapper")
 public class ElasticsearchApplication {
 

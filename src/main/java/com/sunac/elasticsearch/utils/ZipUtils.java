@@ -1,11 +1,8 @@
 package com.sunac.elasticsearch.utils;
 
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.*;
-import com.sunac.elasticsearch.utils.ZipCompress;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -54,15 +51,7 @@ public class ZipUtils {
             }
         }
     }
-    @Test
-    public void test(){
-        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/" + new ArgsUtils().getyear() + "/" + new ArgsUtils().getMonth();
 
-
-        TarFile tarFile = new TarFile();
-
-
-    }
     /**
      * @param sourceFile       源文件
      * @param zos              zip输出流

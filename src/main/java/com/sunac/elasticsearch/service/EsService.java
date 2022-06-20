@@ -31,5 +31,5 @@ public interface EsService {
      * @Author: xiyang
      * @Date 2022/6/10 12:14 下午
      **/
-    void writeExcel(String filePath);
+    void writeExcel(String filePath,String yaer, String month);
 }

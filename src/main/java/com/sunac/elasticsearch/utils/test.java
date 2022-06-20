@@ -15,7 +15,7 @@ import java.util.zip.ZipOutputStream;
  * @Version 1.0
  */
 public class test {
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         //需要处理的文件夹路径
         String path = "F://tarTest";
@@ -32,7 +32,7 @@ public class test {
     }
 
     /**
-     * @[TOC](压缩)文件
+     *
      * @param path   要压缩的文件路径
      * @param format 生成的格式（zip、rar）d
      * @param outPath 输出的文件路径
@@ -49,7 +49,8 @@ public class test {
         File compress = new File(generateFile);
         // 如果文件夹不存在则进行创建
         if( !compress.exists() ){
-            compress.mkdirs();
+            boolean mkdirs = compress.mkdirs();
+            System.out.println("mkdirs = " + mkdirs);
         }
         DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         Calendar calendar = Calendar.getInstance();

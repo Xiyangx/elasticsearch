@@ -22,9 +22,9 @@ public class ArgsUtils {
      * @Author: xiyang
      * @Date 2022/6/10 11:35 上午
      **/
-    public List<String> getBeforeMonth() {
+    public static List<String> getBeforeMonth(String monthStr) {
 
-        int month = Integer.parseInt(getMonth());
+        int month = Integer.parseInt(monthStr);
         List<String> monthList = new ArrayList<>();
         //每年1月份的时候，需要去年整年的数据，所以返回整年的月份集合
         if (month == 1) {
@@ -49,7 +49,7 @@ public class ArgsUtils {
      * @Author: xiyang
      * @Date 2022/6/9 7:17 下午
      **/
-    public String getMonth() {
+    public static String getMonth() {
         return new SimpleDateFormat("MM").format(new Date());
     }
 
@@ -60,7 +60,7 @@ public class ArgsUtils {
      * @Author: xiyang
      * @Date 2022/6/9 7:17 下午
      **/
-    public String getyear() {
+    public static String getyear() {
         //每年1月份的时候，需要去年整年的数据，所以返回去年的年份
         if (Integer.parseInt(getMonth()) == 1) {
             Calendar c = Calendar.getInstance();
@@ -78,7 +78,7 @@ public class ArgsUtils {
      * @Author: xiyang
      * @Date 2022/6/14 2:23 下午
      **/
-    public String getPartition(){
+    public static String getPartition(){
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         c.add(Calendar.DAY_OF_MONTH, -1);
