@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    dynamic:
+      primary: master #设置默认的数据源或者数据源组,默认值即为master
+      strict: false #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
+      datasource:
+        master:
+          url: jdbc:hive2://172.17.44.36:10000/sunac
+          username: hive
+          password: hive_123
+          driver-class-name: org.apache.hive.jdbc.HiveDriver
+        slave_mysql:
+          url: jdbc:mysql://172.17.44.44:3306/data_platform?useSSL=false
+#          url: jdbc:mysql://172.17.32.135:3306/data_platform?useSSL=false
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: data_platform
+          password: D5~76Jc7a28cYQMw027bmZ8WZ
+#          username: root
+#          password: 12345678
+logging:
+  level:
+    com.example.hive.mapper: debug
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
