@@ -44,12 +44,12 @@ public class DownloadController {
 
     @RequestMapping(value = "/download/{year}/{month}/{company}", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String year, @PathVariable String month,@PathVariable String company) throws IOException {
-
-        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/"
-                  + year
-                  + "/"
-                  + month
-                  + "/";
+//        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/"
+        String filePath = "/opt/project/file/"
+                + year
+                + "/"
+                + month
+                + "/";
         String fileName = company + ".xlsx";
         logger.info("--------要下载的文件是：{}/{}/{}.xlsx------",year,month,company);
 
@@ -60,11 +60,14 @@ public class DownloadController {
     private ResponseEntity<InputStreamResource> getInputStreamResourceResponseEntity(String filePath, String fileName) throws IOException {
         FileSystemResource file = new FileSystemResource(filePath + fileName);
         logger.info("--------正在下载------");
+        String originalFileName = URLEncoder.encode(fileName, "utf-8");
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("content-disposition","attachment;filename="+ URLEncoder.encode(fileName,"utf-8"));
+        headers.add("content-disposition", "attachment;filename*=utf-8''" + originalFileName);
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
+
 
         return ResponseEntity
                 .ok()
