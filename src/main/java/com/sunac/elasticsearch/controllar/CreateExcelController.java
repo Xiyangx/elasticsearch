@@ -2,6 +2,7 @@ package com.sunac.elasticsearch.controllar;
 
 import com.sunac.elasticsearch.entity.InsertLog;
 import com.sunac.elasticsearch.service.impl.EsServiceImpl;
+import com.sunac.elasticsearch.service.impl.HiveSqlServiceImpl;
 import com.sunac.elasticsearch.service.impl.InserLogServiceImpl;
 import com.sunac.elasticsearch.utils.ArgsUtils;
 import com.sunac.elasticsearch.utils.ZipUtils;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.List;
 
 /**
  * @Description: TODO
@@ -30,6 +32,8 @@ public class CreateExcelController {
     private EsServiceImpl esServiceImpl;
     @Autowired
     private InserLogServiceImpl inserLogServiceImpl;
+    @Autowired
+    private HiveSqlServiceImpl hiveSqlServiceImpl;
     /**
      * @Description: TODO
      * @Param: [year, month] 当前年份，当前月份
@@ -40,41 +44,27 @@ public class CreateExcelController {
     @RequestMapping(value = "/createExcel/{year}/{month}")
     public void getString(@PathVariable String year, @PathVariable String month) {
 
-//         String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/" + new ArgsUtils().getyear() + "/" + new ArgsUtils().getMonth();
-        String filePath = "/opt/project/file/" + year + "/" + ArgsUtils.getBeforeMonth(month).get(ArgsUtils.getBeforeMonth(month).size()-1);
-
-        File file = new File(filePath);
-        //判断是否存在
-        if(file.exists()) {
-            boolean delete = file.delete();
-
-
-            System.out.println("目录存在并删除" + delete);
-        } else {
-            boolean mkdirs = file.mkdirs();
-            System.out.println("创建目录成功" + mkdirs);
-        }
-
+//         String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/" + year + "/" + month + "/";
+        String filePath = "/opt/project/file/" + year + "/" + month + "/";
+        List<String> companyAreaList = hiveSqlServiceImpl.getCompanyAreaList();
+        //创建月份的文件夹
+        ZipUtils.mkdir(filePath);
+        //创建各个大区的文件夹
+        ZipUtils.mkdirCompanyAreaPath(companyAreaList,filePath);
         logger.info("正在生成excel文件");
+        //生成excel
         esServiceImpl.writeExcel(filePath, year, month);
 
         logger.info("生成全部excel文件成功");
-        logger.info("正在压缩excel文件");
-        FileOutputStream fos1 = null;
-        String zipFile = filePath + ".zip";
-        File zip = new File(zipFile);
-        if(file.exists()) {
-            boolean delete = zip.delete();
-            System.out.println("zip存在并删除" + delete);
-        }
-        try {
-            fos1 = new FileOutputStream(filePath + ".zip");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        ZipUtils.toZip(filePath, fos1, true);
-        logger.info("压缩excel文件成功");
-
+        logger.info("正在压缩月份的excel文件");
+        //压缩所有的文件
+        ZipUtils.zipForGroup(filePath);
+        logger.info("压缩月份的excel文件成功");
+        logger.info("正在压缩大区的excel文件");
+        //压缩大区的文件
+        ZipUtils.zipForArea(companyAreaList,filePath);
+        logger.info("压缩大区的excel文件成功");
+        //在数据库标记文件生成成功
         boolean save = inserLogServiceImpl.save(new InsertLog(year, ArgsUtils.getBeforeMonth(month).get(ArgsUtils.getBeforeMonth(month).size()-1)));
         logger.info("插入mysql log表数据：{}", save);
 

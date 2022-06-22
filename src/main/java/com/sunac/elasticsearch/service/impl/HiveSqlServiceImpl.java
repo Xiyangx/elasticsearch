@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: TODO
@@ -23,12 +26,27 @@ public class HiveSqlServiceImpl implements HiveSqlService {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Company> getCompanyList() {
-        System.out.println(222222222);
-        String sql = "SELECT hcode,hname FROM sunac.`dwd_fd_sap_hs_ztfi0005_df` " +
-                "WHERE SUBSTR(NIDUP,0,3) ='E02' " +
-                "AND ntype='F' " +
-                "AND stat_date =" + ArgsUtils.getPartition();
-        return jdbcTemplate.query(sql, (resultSet, i) -> new Company(resultSet.getString("hcode"), resultSet.getString("hname")));
+    public List<String> getCompanyAreaList() {
+        String sql = "SELECT hname FROM sunac.`dwd_fd_sap_hs_ztfi0005_df` " +
+                "WHERE NIDUP ='E02' " +
+                "AND stat_date = " + ArgsUtils.getPartition() +" " +
+                "GROUP by hname";
+        return jdbcTemplate.query(sql,(resultSet , i) -> resultSet.getString("hname"));
+    }
+
+    @Override
+    public Map<String, List<Company>> getAreaMap(List<String> list) {
+
+        Map<String, List<Company>> listHashMap = new HashMap<>();
+        for (String s : list) {
+            String sql = "SELECT hcode,hname FROM sunac.`dwd_fd_sap_hs_ztfi0005_df` " +
+                    "WHERE SUBSTR(NIDUP,0,3) ='E02' " +
+                    "AND ntype='F' " +
+                    "AND stat_date =" + ArgsUtils.getPartition() + " " +
+                    "and nupnm = '" + s + "'";
+            List<Company> companyList = jdbcTemplate.query(sql, (resultSet, i) -> new Company(resultSet.getString("hcode"), resultSet.getString("hname")));
+            listHashMap.put(s,companyList);
+        }
+        return listHashMap;
     }
 }

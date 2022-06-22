@@ -3,6 +3,7 @@ package com.sunac.elasticsearch.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -102,6 +103,104 @@ public class ZipUtils {
 
                 }
             }
+        }
+    }
+    /**
+     * @Description: 创建大区文件夹
+     * @Param: [companyAreaList, path]
+     * @Return: void
+     * @Author: xiyang
+     * @Date 2022/6/22 12:00 下午
+     **/
+    public static void mkdirCompanyAreaPath(List<String> companyAreaList,String path){
+        for (String companyArea : companyAreaList) {
+            mkdir(path + companyArea);
+        }
+    }
+
+    /**
+     * @Description: 创建大区文件夹
+     * @Param: [companyAreaList, path]
+     * @Return: void
+     * @Author: xiyang
+     * @Date 2022/6/22 12:00 下午
+     **/
+    public static void mkdir(String path){
+
+        File file = new File(path);
+        //判断是否存在
+        if(file.exists()) {
+            delLinuxFile(path);
+            boolean mkdirs = file.mkdirs();
+            logger.info("{},重新创建目录,{}",path,mkdirs);
+        } else {
+            boolean mkdirs = file.mkdirs();
+            logger.info("{},目录不存在，创建目录,{}",path,mkdirs);
+        }
+    }
+
+    /**
+     * @Description: 压缩文件函数
+     * @Param: [groupPath]
+     * @Return: void
+     * @Author: xiyang
+     * @Date 2022/6/22 4:38 下午
+     **/
+    private static void zip(String groupPath) {
+        FileOutputStream fos1 = null;
+        String zipName = groupPath.substring(0,groupPath.length()-1) + ".zip";
+
+        try {
+            fos1 = new FileOutputStream(zipName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        ZipUtils.toZip(groupPath, fos1, true);
+    }
+
+    /**
+     * @Description: 压缩集团文件 06.zip
+     * @Param: [groupPath]
+     * @Return: void
+     * @Author: xiyang
+     * @Date 2022/6/22 4:38 下午
+     **/
+    public static void zipForGroup(String groupPath){
+        zip(groupPath);
+    }
+    /**
+     * @Description: 压缩大区文件 北京大区.zip
+     * @Param: [areaList, groupPath]
+     * @Return: void
+     * @Author: xiyang
+     * @Date 2022/6/22 4:39 下午
+     **/
+    public static void zipForArea(List<String> areaList, String groupPath){
+        for (String area : areaList) {
+            String path = groupPath + area + "/";
+            zip(path);
+        }
+    }
+    /**
+     * @Description: 删除文件夹
+     * @Param: [filePath]
+     * @Return: void
+     * @Author: xiyang
+     * @Date 2022/6/22 4:39 下午
+     **/
+    public static void delLinuxFile(String filePath) {
+        String cmd = "rm -rf " + filePath;
+        try {
+            Process process = Runtime.getRuntime().exec(cmd);
+            int i = process.waitFor();
+            if (i == 0){
+                logger.info("{}目录或文件删除成功",filePath);
+            } else {
+                logger.info("{}目录或文件删除失败",filePath);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

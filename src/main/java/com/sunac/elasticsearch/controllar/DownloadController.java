@@ -23,17 +23,54 @@ public class DownloadController {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadController.class);
 
+    /**
+     * @Description: 下载大区的zip
+     * @Param: [year, month, area]
+     * @Return: org.springframework.http.ResponseEntity<org.springframework.core.io.InputStreamResource>
+     * @Author: xiyang
+     * @Date 2022/6/22 4:06 下午
+     **/
+    @RequestMapping(value = "/download/{year}/{month}/{area}", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String year, @PathVariable String month, @PathVariable String area) throws IOException {
+
+//        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/" + year + "/" + month + "/";
+        String filePath = "/opt/project/file/" + year + "/" + month + "/";
+        String fileName = area + ".zip";
+
+        logger.info("--------要下载的文件是：{}/{}/{}.zip------",year,month,area);
+
+        return getInputStreamResourceResponseEntity(filePath, fileName);
+
+    }
+    /**
+     * @Description: 下载单个公司的excel
+     * @Param: [year, month, area, company]
+     * @Return: org.springframework.http.ResponseEntity<org.springframework.core.io.InputStreamResource>
+     * @Author: xiyang
+     * @Date 2022/6/22 4:07 下午
+     **/
+    @RequestMapping(value = "/download/{year}/{month}/{area}/{company}", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String year, @PathVariable String month,@PathVariable String area, @PathVariable String company) throws IOException {
+//        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/" + year + "/" + month + "/" + area + "/";
+        String filePath = "/opt/project/file/" + year + "/" + month + "/" + area + "/";
+        String fileName = company + ".xlsx";
+        logger.info("--------要下载的文件是：{}/{}/{}.xlsx------",year,month,company);
+
+        return getInputStreamResourceResponseEntity(filePath, fileName);
+
+    }
+    /**
+     * @Description: 下载集团的zip
+     * @Param: [year, month]
+     * @Return: org.springframework.http.ResponseEntity<org.springframework.core.io.InputStreamResource>
+     * @Author: xiyang
+     * @Date 2022/6/22 4:07 下午
+     **/
     @RequestMapping(value = "/download/{year}/{month}", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String year, @PathVariable String month) throws IOException {
 
-//        String fileName = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/"
-//                  + year
-//                  + "/"
-//                  + month
-//                  + ".zip";
-        String filePath = "/opt/project/file/"
-                + year
-                + "/";
+//        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/" + year + "/";
+        String filePath = "/opt/project/file/" + year + "/";
         String fileName = month + ".zip";
 
         logger.info("--------要下载的文件是：{}/{}.zip------",year,month);
@@ -41,22 +78,13 @@ public class DownloadController {
         return getInputStreamResourceResponseEntity(filePath, fileName);
 
     }
-
-    @RequestMapping(value = "/download/{year}/{month}/{company}", method = RequestMethod.GET)
-    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String year, @PathVariable String month,@PathVariable String company) throws IOException {
-//        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/"
-        String filePath = "/opt/project/file/"
-                + year
-                + "/"
-                + month
-                + "/";
-        String fileName = company + ".xlsx";
-        logger.info("--------要下载的文件是：{}/{}/{}.xlsx------",year,month,company);
-
-        return getInputStreamResourceResponseEntity(filePath, fileName);
-
-    }
-
+    /**
+     * @Description: 下载文件工具类
+     * @Param: [filePath, fileName]
+     * @Return: org.springframework.http.ResponseEntity<org.springframework.core.io.InputStreamResource>
+     * @Author: xiyang
+     * @Date 2022/6/22 4:08 下午
+     **/
     private ResponseEntity<InputStreamResource> getInputStreamResourceResponseEntity(String filePath, String fileName) throws IOException {
         FileSystemResource file = new FileSystemResource(filePath + fileName);
         logger.info("--------正在下载------");

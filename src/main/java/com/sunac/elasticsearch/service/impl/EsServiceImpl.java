@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @Description: TODO
@@ -88,39 +90,46 @@ public class EsServiceImpl implements EsService {
      **/
     @Override
     public void writeExcel(String filePath, String yaer, String monthStr ) {
-        List<Company> companyList = hiveSqlServiceImpl.getCompanyList();
+        List<String> companyAreaList = hiveSqlServiceImpl.getCompanyAreaList();
+        Map<String, List<Company>> areaMap = hiveSqlServiceImpl.getAreaMap(companyAreaList);
 
-        for (Company company : companyList) {
+        Set<Map.Entry<String, List<Company>>> entries = areaMap.entrySet();
+        for (Map.Entry<String, List<Company>> entry : entries) {
+            String area = entry.getKey();
+            List<Company> companies = entry.getValue();
+            for (Company company : companies) {
 
 
-            List<String> beforeMonth = ArgsUtils.getBeforeMonth(monthStr);
-            FileOutputStream outputStream = null;
-            try {
-                outputStream = new FileOutputStream(filePath + "/" + company.getHcode()+company.getHname() + ".xlsx");
+                List<String> beforeMonth = ArgsUtils.getBeforeMonth(monthStr);
+                FileOutputStream outputStream = null;
+                try {
+                    outputStream = new FileOutputStream(filePath + area + "/" + company.getHcode()+company.getHname() + ".xlsx");
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
 
-            ExcelWriter excelWriter = EasyExcel.write(outputStream).build();
-            for (String month : beforeMonth) {
-                List<Report> reportList = getReportList(company.getHcode(), yaer, month);
+                ExcelWriter excelWriter = EasyExcel.write(outputStream).build();
+                for (String month : beforeMonth) {
+                    List<Report> reportList = getReportList(company.getHcode(), yaer, month);
 
-                WriteSheet sheet = EasyExcel.writerSheet(Integer.parseInt(month), month).head(Report.class).build();
+                    WriteSheet sheet = EasyExcel.writerSheet(Integer.parseInt(month), month).head(Report.class).build();
 
-                //然后写到第一个sheet，名字为模板 然后文件流会自动关闭
-                excelWriter.write(reportList, sheet);
-                logger.info("----------- {} {}月 写入完成 -----------", company.getHname(), month);
-            }
-            //关闭流
-            excelWriter.finish();
-            //
-            try {
-                assert outputStream != null;
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                    //然后写到第一个sheet，名字为模板 然后文件流会自动关闭
+                    excelWriter.write(reportList, sheet);
+                    logger.info("----------- {} {}月 写入完成 -----------", company.getHname(), month);
+                }
+                //关闭流
+                excelWriter.finish();
+                //
+                try {
+                    assert outputStream != null;
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+
     }
 }

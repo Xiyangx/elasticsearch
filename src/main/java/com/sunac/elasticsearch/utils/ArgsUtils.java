@@ -26,16 +26,11 @@ public class ArgsUtils {
 
         int month = Integer.parseInt(monthStr);
         List<String> monthList = new ArrayList<>();
-        //每年1月份的时候，需要去年整年的数据，所以返回整年的月份集合
-        if (month == 1) {
-            int cursor = 12 + 1;
-            for (int i = 1; i < cursor; i++) {
-                String strMonth = "0" + i;
-                monthList.add(strMonth);
-            }
-        } else {
-            for (int i = 1; i < month; i++) {
-                String strMonth = "0" + i;
+        for (int i = 1; i <= month; i++) {
+            String strMonth = "0" + i;
+            if (i > 9){
+                monthList.add(strMonth.substring(1));
+            } else {
                 monthList.add(strMonth);
             }
         }

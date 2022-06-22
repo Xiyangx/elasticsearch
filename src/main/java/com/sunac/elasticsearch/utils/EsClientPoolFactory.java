@@ -6,6 +6,8 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @Description: TODO
@@ -15,9 +17,11 @@ import org.elasticsearch.client.RestHighLevelClient;
  */
 public class EsClientPoolFactory implements PooledObjectFactory<RestHighLevelClient> {
 
+    private static final Logger logger = LoggerFactory.getLogger(PooledObjectFactory.class);
+
     @Override
     public void activateObject(PooledObject<RestHighLevelClient> arg0) {
-        System.out.println("activateObject");
+        logger.info("创建es连接对象");
 
     }
 
@@ -50,7 +54,7 @@ public class EsClientPoolFactory implements PooledObjectFactory<RestHighLevelCli
 
     @Override
     public void passivateObject(PooledObject<RestHighLevelClient> arg0) {
-        System.out.println("passivateObject");
+        logger.info("创建es连接对象");
     }
 
     @Override
