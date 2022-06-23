@@ -1,11 +1,7 @@
 package com.sunac.elasticsearch.service;
 
-import com.sunac.elasticsearch.entity.Company;
 import com.sunac.elasticsearch.entity.Report;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 /**

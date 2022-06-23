@@ -1,7 +1,6 @@
 package com.sunac.elasticsearch.utils;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,10 +16,10 @@ public class ArgsUtils {
 
     /**
      * @Description: 获取当前每年首月到当前月的集合
-     * @Param: []
+     * @Param: [monthStr]
      * @Return: java.util.List<java.lang.String>
      * @Author: xiyang
-     * @Date 2022/6/10 11:35 上午
+     * @Date 2022/6/22 4:42 下午
      **/
     public static List<String> getBeforeMonth(String monthStr) {
 

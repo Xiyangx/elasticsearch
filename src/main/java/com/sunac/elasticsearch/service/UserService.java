@@ -1,10 +1,8 @@
 package com.sunac.elasticsearch.service;
 
-import com.alibaba.fastjson.JSON;
 import com.sunac.elasticsearch.entity.User;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Description: TODO

@@ -21,21 +21,26 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ESUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ESUtil.class);
+/**
+ * @Description: es查找数据工具类
+ * @Author xiyang
+ * @Date 2022/6/23 2:55 下午
+ * @Version 1.0
+ */
+public class EsUtil {
+    private static final Logger logger = LoggerFactory.getLogger(EsUtil.class);
 
     private static final long SCROLL_TIMEOUT = 180000;
 
     private final static int SIZE = 1000;
 
     /**
-     * 构建SearchResponse
-     *
-     * @param client     restHighLevelClient
-     * @param query      queryBuilder
-     * @return List, 可以使用fun转换为T结果
-     *
-     */
+     * @Description: 按照条件查找es数据
+     * @Param:
+     * @Return:
+     * @Author: xiyang
+     * @Date 2022/6/23 2:54 下午
+     **/
     public static List<Report> searchResponse(RestHighLevelClient client, BoolQueryBuilder query) throws Exception {
         //滚动查询的Scroll
         Scroll scroll = new Scroll(TimeValue.timeValueMillis(SCROLL_TIMEOUT));
