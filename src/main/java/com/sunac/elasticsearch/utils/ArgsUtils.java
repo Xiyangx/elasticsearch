@@ -1,10 +1,7 @@
 package com.sunac.elasticsearch.utils;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Description: 日期参数类
@@ -77,5 +74,28 @@ public class ArgsUtils {
         c.setTime(new Date());
         c.add(Calendar.DAY_OF_MONTH, -1);
         return new SimpleDateFormat("yyyyMMdd").format(c.getTime());
+    }
+
+    /**
+     * @Description: 单个账目时。获取前端输入的月份期间的list
+     * @Param: [bsegH2Monat]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: xiyang
+     * @Date 2022/6/27 3:12 下午
+     **/
+    public static List<String> getBsegH2Monat(String bsegH2Monat){
+        String[] split = bsegH2Monat.split(",");
+        return new ArrayList<>(Arrays.asList(split));
+    }
+    /**
+     * @Description: 单个账目时。获取前端输入的公司代码的list
+     * @Param: [bsegBukrs]
+     * @Return: java.util.List<java.lang.String>
+     * @Author: xiyang
+     * @Date 2022/6/27 3:14 下午
+     **/
+    public static List<String> getBsegBukrs(String bsegBukrs){
+        String[] split = bsegBukrs.split(",");
+        return new ArrayList<>(Arrays.asList(split));
     }
 }

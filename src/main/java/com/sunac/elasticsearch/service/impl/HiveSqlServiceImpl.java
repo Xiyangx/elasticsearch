@@ -48,4 +48,22 @@ public class HiveSqlServiceImpl implements HiveSqlService {
         }
         return listHashMap;
     }
+
+    @Override
+    public List<Company> getSimpleAreaMap(List<String> list) {
+        StringBuilder hcodes = new StringBuilder();
+        for (String s : list) {
+            hcodes.append("'").append(s).append("'").append(",");
+        }
+        String substring = hcodes.substring(0, hcodes.length() - 1);
+
+        String sql = "SELECT hcode,hname FROM sunac.`dwd_fd_sap_hs_ztfi0005_df` " +
+                "WHERE SUBSTR(NIDUP,0,3) ='E02' " +
+                "AND ntype='F' " +
+                "AND stat_date =" + ArgsUtils.getPartition() + " " +
+                "and hcode in ( " + substring + ")" + " " +
+                "group by hcode,hname";
+
+        return jdbcTemplate.query(sql, (resultSet, i) -> new Company(resultSet.getString("hcode"), resultSet.getString("hname")));
+    }
 }

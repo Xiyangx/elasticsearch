@@ -11,6 +11,7 @@ import com.sunac.elasticsearch.utils.EsUtil;
 import com.sunac.elasticsearch.utils.ElasticSearchPoolUtil;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.slf4j.Logger;
@@ -81,6 +82,82 @@ public class EsServiceImpl implements EsService {
         return reports;
     }
 
+    @Override
+    public List<Report> getReportList(String companyCode, String year, String month, String bsegHkont, String bsegZzwyfwlx,
+                                      String bsegKostl, String csksKtext, String bsegPrctr, String cepcKtext,
+                                      String bsegZzlfinr, String lfa1Name1, String bsegZzkunnr, String kna1Name1) {
+        try {
+            //从连接池里获取es连接
+            client = ElasticSearchPoolUtil.getClient();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        logger.info("{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/",companyCode,year,month,bsegHkont,bsegZzwyfwlx,bsegKostl,csksKtext,bsegPrctr,cepcKtext,bsegZzlfinr,lfa1Name1,bsegZzkunnr,kna1Name1);
+        //创建复合查询条件对象
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        MatchQueryBuilder termsQueryBuilder1 = QueryBuilders.matchQuery("bsegbukrs.keyword", companyCode);
+        MatchQueryBuilder termsQueryBuilder2 = QueryBuilders.matchQuery("bseggjahr.keyword", year);
+        MatchQueryBuilder termsQueryBuilder3 = QueryBuilders.matchQuery("bsegh2monat.keyword", month);
+        MatchQueryBuilder termsQueryBuilder4 = QueryBuilders.matchQuery("bseghkont.keyword", bsegHkont);
+        BoolQueryBuilder must = boolQueryBuilder
+                .must(termsQueryBuilder1)
+                .must(termsQueryBuilder2)
+                .must(termsQueryBuilder3)
+                .must(termsQueryBuilder4);
+        String isEmpty = " ";
+        //条件
+        if (!bsegZzwyfwlx.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder5 = QueryBuilders.matchQuery("bsegzzwyfwlx", bsegZzwyfwlx.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder5);
+        }
+        if (!bsegKostl.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder6 = QueryBuilders.matchQuery("bsegkostl", bsegKostl.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder6);
+        }
+        if (!csksKtext.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder7 = QueryBuilders.matchQuery("csksktext", csksKtext.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder7);
+        }
+        if (!bsegPrctr.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder8 = QueryBuilders.matchQuery("bsegprctr", bsegPrctr.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder8);
+        }
+        if (!cepcKtext.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder9 = QueryBuilders.matchQuery("cepcktext", cepcKtext.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder9);
+        }
+        if (!bsegZzlfinr.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder10 = QueryBuilders.matchQuery("bsegzzlfinr", bsegZzlfinr.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder10);
+        }
+        if (!lfa1Name1.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder11 = QueryBuilders.matchQuery("lfa1name1", lfa1Name1.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder11);
+        }
+        if (!bsegZzkunnr.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder12 = QueryBuilders.matchQuery("bsegzzkunnr", bsegZzkunnr.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder12);
+        }
+        if (!kna1Name1.contains(isEmpty)){
+            MatchQueryBuilder termsQueryBuilder13 = QueryBuilders.matchQuery("kna1name1", kna1Name1.replace(","," "));
+            boolQueryBuilder.must(termsQueryBuilder13);
+        }
+
+        //创建放数据的list
+        List<Report> reports = null;
+        try {
+            //获取数据
+            reports = EsUtil.searchResponse(client, must);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //关闭es连接
+        ElasticSearchPoolUtil.returnClient(client);
+        //返回数据
+        return reports;
+    }
+
     /**
      * @Description: 把数据写入csv文件
      * @Param: [list]
@@ -134,6 +211,49 @@ public class EsServiceImpl implements EsService {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+
+    }
+
+    @Override
+    public void writeExcel(String filePath, String bsegGjahr, String bsegH2Monat, String bsegBukrs, String bsegHkont, String bsegZzwyfwlx, String bsegKostl, String csksKtext, String bsegPrctr, String cepcKtext, String bsegZzlfinr, String lfa1Name1, String bsegZzkunnr, String kna1Name1) {
+        //获取各个大区下面公司代码和公司名称的集合
+        List<Company> areaList = hiveSqlServiceImpl.getSimpleAreaMap(ArgsUtils.getBsegBukrs(bsegBukrs));
+
+        //遍历
+        for (Company company : areaList) {
+            //获取年初1月当前月份的月份列表 [01,02,03]
+            List<String> beforeMonth = ArgsUtils.getBsegH2Monat(bsegH2Monat);
+            //声明输出流
+            FileOutputStream outputStream = null;
+            try {
+                //创建文件
+                outputStream = new FileOutputStream(filePath + company.getHcode()+company.getHname() + ".xlsx");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            //创建excel对象
+            ExcelWriter excelWriter = EasyExcel.write(outputStream).build();
+            //每个月一个sheet页
+            for (int i = 0; i < beforeMonth.size(); i++) {
+                //从es获取每个月份的数据
+                List<Report> reportList = getReportList(company.getHcode(), bsegGjahr, beforeMonth.get(i),bsegHkont,bsegZzwyfwlx,bsegKostl,csksKtext,bsegPrctr,cepcKtext,bsegZzlfinr,lfa1Name1,bsegZzkunnr,kna1Name1);
+                //创建写入sheet页的对象
+                WriteSheet sheet = EasyExcel.writerSheet(i+1, beforeMonth.get(i)).head(Report.class).build();
+                //写入sheet
+                excelWriter.write(reportList, sheet);
+                logger.info("----------- {} {}月 写入完成 -----------", company.getHname(), beforeMonth.get(i));
+            }
+
+            //关闭流
+            excelWriter.finish();
+            try {
+                //关闭输出流
+                assert outputStream != null;
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
