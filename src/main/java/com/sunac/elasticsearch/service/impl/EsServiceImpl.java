@@ -9,6 +9,7 @@ import com.sunac.elasticsearch.service.EsService;
 import com.sunac.elasticsearch.utils.ArgsUtils;
 import com.sunac.elasticsearch.utils.EsUtil;
 import com.sunac.elasticsearch.utils.ElasticSearchPoolUtil;
+import com.sunac.elasticsearch.utils.ZipUtils;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -225,35 +227,49 @@ public class EsServiceImpl implements EsService {
         for (Company company : areaList) {
             //获取年初1月当前月份的月份列表 [01,02,03]
             List<String> beforeMonth = ArgsUtils.getBsegH2Monat(bsegH2Monat);
-            //声明输出流
-            FileOutputStream outputStream = null;
-            try {
-                //创建文件
-                outputStream = new FileOutputStream(filePath + company.getHcode()+company.getHname() + ".xlsx");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            //创建excel对象
-            ExcelWriter excelWriter = EasyExcel.write(outputStream).build();
+            //判断是否整个excel都是空的
+            int excelIsEmpty = 0;
+            //汇总每个月份的数据列表
+            List<Report> reportList = new ArrayList<>();
             //每个月一个sheet页
-            for (int i = 0; i < beforeMonth.size(); i++) {
+            for (String s : beforeMonth) {
                 //从es获取每个月份的数据
-                List<Report> reportList = getReportList(company.getHcode(), bsegGjahr, beforeMonth.get(i),bsegHkont,bsegZzwyfwlx,bsegKostl,csksKtext,bsegPrctr,cepcKtext,bsegZzlfinr,lfa1Name1,bsegZzkunnr,kna1Name1);
+                List<Report> reports = getReportList(company.getHcode(), bsegGjahr, s, bsegHkont, bsegZzwyfwlx, bsegKostl, csksKtext, bsegPrctr, cepcKtext, bsegZzlfinr, lfa1Name1, bsegZzkunnr, kna1Name1);
+                reportList.addAll(reports);
+                excelIsEmpty = excelIsEmpty + reports.size();
+
+            }
+            //判断是否整个excel都是空的,空的时候删除
+
+            if (excelIsEmpty != 0){
+                //声明输出流
+                FileOutputStream outputStream = null;
+                try {
+                    //创建文件
+                    outputStream = new FileOutputStream(filePath + company.getHcode()+company.getHname() + ".xlsx");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                //创建excel对象
+                ExcelWriter excelWriter = EasyExcel.write(outputStream).build();
+
+
                 //创建写入sheet页的对象
-                WriteSheet sheet = EasyExcel.writerSheet(i+1, beforeMonth.get(i)).head(Report.class).build();
+                WriteSheet sheet = EasyExcel.writerSheet(1).head(Report.class).build();
                 //写入sheet
                 excelWriter.write(reportList, sheet);
-                logger.info("----------- {} {}月 写入完成 -----------", company.getHname(), beforeMonth.get(i));
-            }
-
-            //关闭流
-            excelWriter.finish();
-            try {
-                //关闭输出流
-                assert outputStream != null;
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                logger.info("----------- {} 写入完成 -----------", company.getHname());
+                //关闭流
+                excelWriter.finish();
+                try {
+                    //关闭输出流
+                    assert outputStream != null;
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }else {
+                logger.info("----------- {} 文件没有数据，不写入excel -----------", company.getHname());
             }
         }
 
