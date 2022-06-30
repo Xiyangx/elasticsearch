@@ -1,5 +1,6 @@
 package com.sunac.elasticsearch.controllar;
 
+import com.sunac.elasticsearch.entity.Company;
 import com.sunac.elasticsearch.entity.InsertLog;
 import com.sunac.elasticsearch.service.impl.EsServiceImpl;
 import com.sunac.elasticsearch.service.impl.HiveSqlServiceImpl;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: TODO
@@ -44,13 +46,15 @@ public class CreateExcelController {
 //         String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/" + year + "/" + month + "/";
         String filePath = "/opt/project/file/" + year + "/" + month + "/";
         List<String> companyAreaList = hiveSqlServiceImpl.getCompanyAreaList();
+        //获取各个大区下面公司代码和公司名称的集合
+        Map<String, List<Company>> areaMap = hiveSqlServiceImpl.getAreaMap(companyAreaList);
         //创建月份的文件夹
         ZipUtils.mkdir(filePath);
         //创建各个大区的文件夹
         ZipUtils.mkdirCompanyAreaPath(companyAreaList,filePath);
         logger.info("正在生成excel文件");
         //生成excel
-        esServiceImpl.writeExcel(filePath, year, month);
+        esServiceImpl.writeExcel(filePath, year, month, areaMap);
 
         logger.info("生成全部excel文件成功");
         logger.info("正在压缩月份的excel文件");

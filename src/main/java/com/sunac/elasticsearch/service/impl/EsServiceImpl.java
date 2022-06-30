@@ -9,7 +9,6 @@ import com.sunac.elasticsearch.service.EsService;
 import com.sunac.elasticsearch.utils.ArgsUtils;
 import com.sunac.elasticsearch.utils.EsUtil;
 import com.sunac.elasticsearch.utils.ElasticSearchPoolUtil;
-import com.sunac.elasticsearch.utils.ZipUtils;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
@@ -17,7 +16,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
@@ -37,9 +35,6 @@ import java.util.Set;
 @Service
 public class EsServiceImpl implements EsService {
 
-
-    @Autowired
-    private HiveSqlServiceImpl hiveSqlServiceImpl;
 
     private static final Logger logger = LoggerFactory.getLogger(EsServiceImpl.class);
 
@@ -168,11 +163,8 @@ public class EsServiceImpl implements EsService {
      * @Date 2022/6/10 12:16 下午
      **/
     @Override
-    public void writeExcel(String filePath, String yaer, String monthStr ) {
-        //获取大区列表
-        List<String> companyAreaList = hiveSqlServiceImpl.getCompanyAreaList();
-        //获取各个大区下面公司代码和公司名称的集合
-        Map<String, List<Company>> areaMap = hiveSqlServiceImpl.getAreaMap(companyAreaList);
+    public void writeExcel(String filePath, String yaer, String monthStr, Map<String, List<Company>> areaMap ) {
+
         //遍历集合，每个每个公司每个月份的数据写到excel
         Set<Map.Entry<String, List<Company>>> entries = areaMap.entrySet();
         for (Map.Entry<String, List<Company>> entry : entries) {
@@ -219,9 +211,7 @@ public class EsServiceImpl implements EsService {
     }
 
     @Override
-    public void writeExcel(String filePath, String bsegGjahr, String bsegH2Monat, String bsegBukrs, String bsegHkont, String bsegZzwyfwlx, String bsegKostl, String csksKtext, String bsegPrctr, String cepcKtext, String bsegZzlfinr, String lfa1Name1, String bsegZzkunnr, String kna1Name1) {
-        //获取各个大区下面公司代码和公司名称的集合
-        List<Company> areaList = hiveSqlServiceImpl.getSimpleAreaMap(ArgsUtils.getBsegBukrs(bsegBukrs));
+    public void writeExcel(List<Company> areaList, String filePath, String bsegGjahr, String bsegH2Monat, String bsegBukrs, String bsegHkont, String bsegZzwyfwlx, String bsegKostl, String csksKtext, String bsegPrctr, String cepcKtext, String bsegZzlfinr, String lfa1Name1, String bsegZzkunnr, String kna1Name1) {
 
         //遍历
         for (Company company : areaList) {

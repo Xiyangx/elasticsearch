@@ -1,6 +1,9 @@
 package com.sunac.elasticsearch.controllar;
 
+import com.sunac.elasticsearch.entity.Company;
 import com.sunac.elasticsearch.service.impl.EsServiceImpl;
+import com.sunac.elasticsearch.service.impl.HiveSqlServiceImpl;
+import com.sunac.elasticsearch.utils.ArgsUtils;
 import com.sunac.elasticsearch.utils.ZipUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * @Description: 单个科目的数据下载接口
@@ -31,6 +35,8 @@ public class GetSimpleBsegHkont {
 
     @Autowired
     private EsServiceImpl esServiceImpl;
+    @Autowired
+    private HiveSqlServiceImpl hiveSqlServiceImpl;
     /**
      * @Description: 单个账目的下载
      * @Param: [year, month] 当前年份，当前月份
@@ -47,6 +53,9 @@ public class GetSimpleBsegHkont {
                                                          @PathVariable String lfa1Name1,@PathVariable String bsegZzkunnr,
                                                          @PathVariable String kna1Name1) throws IOException {
 
+        //获取各个大区下面公司代码和公司名称的集合
+        List<Company> areaList = hiveSqlServiceImpl.getSimpleAreaMap(ArgsUtils.getBsegBukrs(bsegBukrs));
+
         long l = System.currentTimeMillis();
 //        String filePath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/simple/" + l + "/";
 //        String zipPath = "/Users/xiyang/Documents/sunac/文档/项目/序时账/excel/simple/";
@@ -58,7 +67,7 @@ public class GetSimpleBsegHkont {
         //创建各个大区的文件夹
         logger.info("正在生成excel文件");
         //生成excel
-        esServiceImpl.writeExcel(filePath, bsegGjahr, bsegH2Monat,bsegBukrs,bsegHkont,bsegZzwyfwlx,bsegKostl,csksKtext,bsegPrctr,cepcKtext,bsegZzlfinr,lfa1Name1,bsegZzkunnr,kna1Name1);
+        esServiceImpl.writeExcel(areaList, filePath, bsegGjahr, bsegH2Monat,bsegBukrs,bsegHkont,bsegZzwyfwlx,bsegKostl,csksKtext,bsegPrctr,cepcKtext,bsegZzlfinr,lfa1Name1,bsegZzkunnr,kna1Name1);
 
         logger.info("生成全部excel文件成功");
         logger.info("正在压缩月份的excel文件");
